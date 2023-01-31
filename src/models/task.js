@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Task.init({
-    id: DataTypes.STRING,
     name: DataTypes.STRING,
     isComplete: DataTypes.BOOLEAN
   }, {
