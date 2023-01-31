@@ -1,60 +1,75 @@
-const db = require('../models');
-const { v4: uuidv4 } = require('uuid');
+const taskService = require('../services/taskServices');
 
 class Controller {
-  static getTasks = async () => {
-    const users = await db.Task.findAll();
-    return users;
-  } 
-    
-  static getTask = async (id) => {
-    const task = await db.Task.findOne({ where: { id: id } });
-    return task;
-  }
-
-  static createTask = async (task) => {
-    const newTask = await db.Task.create({
-        ...task,
-        id: uuidv4(),
-        isComplete: false
-    });
-    return newTask;
-  }
-
-  static deleteTask = (id) => {
-    return new Promise(async (resolve, reject) => {
-      const task = await db.Task.findOne({ where: { id: id } });
-      if(!task) {
-        reject(`Task with id ${id} was not found`);
-      }
-      console.log('task', task)
-      db.Task.destroy({ where: { id: id } });
-      resolve('Task deleted successfully');
-    });
-  }
-
-  static completeTask = (id) => {
-    return new Promise(async (resolve, reject) => {
-      const task = await db.Task.findOne({ where: { id: id } });
-      if(!task) {
-        reject(`Task with id ${id} was not found`);
-      }
-      db.Task.update({ isComplete: true }, { where: { id: id } });
-      task.isComplete = true;
-      resolve(task);
-    })
+  static getTasks = async (req, res) => {
+    const tasks = await taskService.getTasks();
+    res.status(200);
+    res.json(tasks);
   }
   
-  static updateTask = (id, data) => {
-    return new Promise(async (resolve, reject) => {
-      let task = await db.Task.findOne({ where: { id: id } });
-      if(!task) {
-        reject(`Task with id ${id} was not found`);
-      }
-      db.Task.update({ ...data }, { where: { id: id } });
-      task = await db.Task.findOne({ where: { id: id } });
-      resolve(task);
-    });
+  static getTask = async (req, res) => {
+    try {
+      const {id} = req.params;
+      const task = await taskService.getTask(id);
+      res.status(200);
+      res.json(task);
+    }
+    catch(error) {
+      res.status(404);
+      res.json({message: error});
+    }
+  }
+  static createTask = async (req,res) => {
+    const taskData = req.body;
+    try{
+      const task = await taskService.createTask(taskData);
+      res.status(201);
+      res.json(task);
+
+    } catch(error){
+      res.status(400);
+      res.json({message: 'Input is not in JSON'});
+    }
+  }
+
+  static deleteTask = async (req, res) => {
+    try {
+      const {id} = req.params;
+      let status = await taskService.deleteTask(id);
+      res.status(200);
+      res.json({message: status});
+    }
+    catch(error) {
+      res.status(404);
+      res.json({message: error});
+    }
+  }
+
+  static completeTask = async (req, res) => {
+    try {
+      const {id} = req.params;
+      const task = await taskService.completeTask(id);
+      res.status(200);
+      res.json(task);
+    }
+    catch(error) {
+      res.status(404);
+      res.json({message: error});
+    }
+  }
+  
+  static updateTask = async (req, res) => {
+    try {
+      const taskData = req.body;
+      const {id} = req.params;
+      const updatedTask = await taskService.updateTask(id, taskData);
+      res.status(200);
+      res.json(updatedTask);
+    }
+    catch(error) {
+      res.status(404);
+      res.json({message: error});
+    }
   }
 }
 
