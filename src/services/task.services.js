@@ -1,13 +1,26 @@
 const { v4: uuidv4 } = require('uuid');
+const Joi = require('joi');
 const db = require('../models');
+
+const schema = Joi.object({
+  id: Joi.string().uuid().required(),
+  name: Joi.string().min(1).max(30).required(),
+  isComplete: Joi.boolean().required()
+});
+
+const validateId = Joi.object({
+  id: Joi.string().uuid().required()
+});
 
 const createTask = async (task) => {
   const id = uuidv4();
-  return await db.Task.create({
+  const newTask = {
     ...task,
     id,
     isComplete: false
-  });
+  }
+  await schema.validateAsync(newTask);
+  return await db.Task.create(newTask);
 };
 
 const getTasks = async () => {
@@ -19,6 +32,7 @@ const getTasks = async () => {
 };
 
 const getTask = async (id) => {
+  await validateId.validateAsync({ id });
   const task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
     throw new Error(`Task with id ${id} was not found`);
@@ -27,6 +41,7 @@ const getTask = async (id) => {
 };
 
 const deleteTask = async (id) => {
+  await validateId.validateAsync({ id });
   const task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
     throw new Error(`Task with id ${id} was not found`);
@@ -36,6 +51,7 @@ const deleteTask = async (id) => {
 };
 
 const completeTask = async (id) => {
+  await validateId.validateAsync({ id });
   const task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
     throw new Error(`Task with id ${id} was not found`);
@@ -45,12 +61,15 @@ const completeTask = async (id) => {
   return task;
 };
 
-const updateTask = async (id, data) => {
+const updateTask = async (id, data) => { 
+  await validateId.validateAsync({ id });
   let task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
     throw new Error(`Task with id ${id} was not found`);
   }
-  await db.Task.update({ ...data }, { where: { id } });
+  task = {...task, ...data}
+  await schema.validateAsync(task);
+  await db.Task.update(task, { where: { id } });
   task = await db.Task.findOne({ where: { id } });
   return task;
 };
