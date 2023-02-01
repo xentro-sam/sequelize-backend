@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const Joi = require('joi');
 const db = require('../models');
+const HTTPError = require('../utils/errors/HTTPError');
 
 const schema = Joi.object({
   id: Joi.string().uuid().required(),
@@ -19,14 +20,16 @@ const createTask = async (task) => {
     id,
     isComplete: false
   }
-  await schema.validateAsync(newTask);
+  if(await schema.validateAsync(newTask) instanceof Error) {
+    throw new HTTPError('Input is not in JSON', 400);
+  }
   return await db.Task.create(newTask);
 };
 
 const getTasks = async () => {
   const tasks = await db.Task.findAll();
   if (!tasks.length) {
-    throw new Error('No tasks found');
+    throw new HTTPError('No tasks found', 404);
   }
   return tasks;
 };
@@ -35,7 +38,7 @@ const getTask = async (id) => {
   await validateId.validateAsync({ id });
   const task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
-    throw new Error(`Task with id ${id} was not found`);
+    throw new HTTPError(`Task with id ${id} was not found`, 404);
   }
   return task;
 };
@@ -44,7 +47,7 @@ const deleteTask = async (id) => {
   await validateId.validateAsync({ id });
   const task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
-    throw new Error(`Task with id ${id} was not found`);
+    throw new HTTPError(`Task with id ${id} was not found`, 404);
   }
   await db.Task.destroy({ where: { id: id } });
   return 'Task deleted successfully';
@@ -54,7 +57,7 @@ const completeTask = async (id) => {
   await validateId.validateAsync({ id });
   const task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
-    throw new Error(`Task with id ${id} was not found`);
+    throw new HTTPError(`Task with id ${id} was not found`, 404);
   }
   await db.Task.update({ isComplete: true }, { where: { id } });
   task.isComplete = true;
@@ -65,7 +68,7 @@ const updateTask = async (id, data) => {
   await validateId.validateAsync({ id });
   let task = await db.Task.findAll({ where: { id } });
   if (!task.length) {
-    throw new Error(`Task with id ${id} was not found`);
+    throw new HTTPError(`Task with id ${id} was not found`, 404);
   }
   task = {...task, ...data}
   await schema.validateAsync(task);

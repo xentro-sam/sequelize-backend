@@ -1,4 +1,5 @@
 const taskService = require('../services/task.services');
+const HTTPError = require('../utils/errors/HTTPError');
 
 const getTasks = async (req, res) => {
   try {
@@ -7,8 +8,16 @@ const getTasks = async (req, res) => {
     res.json(tasks);
   }
   catch (error) {
-    res.status(404);
-    res.json({ message: error.message });
+    if(error instanceof HTTPError) {
+      res.status(error.status);
+      res.json({ message: error.message });
+      return;
+    }
+    else {
+      res.status(500);
+      res.json({ message: error.message });
+      return;
+    }
   }
 };
 
@@ -20,8 +29,16 @@ const getTask = async (req, res) => {
     res.json(task);
   }
   catch (error) {
-    res.status(404);
-    res.json({ message: error.message });
+    if(error instanceof HTTPError) {
+      res.status(error.status);
+      res.json({ message: error.message });
+      return;
+    }
+    else {
+      res.status(500);
+      res.json({ message: error.message });
+      return;
+    }
   }
 };
 
@@ -33,8 +50,16 @@ const createTask = async (req, res) => {
     res.json(task);
 
   } catch (error) {
-    res.status(400);
-    res.json({ message: 'Input is not in JSON' });
+    if(error instanceof HTTPError) {
+      res.status(error.status);
+      res.json({ message: error.message });
+      return;
+    }
+    else {
+      res.status(500);
+      res.json({ message: error.message });
+      return;
+    }
   }
 };
 
@@ -46,8 +71,16 @@ const deleteTask = async (req, res) => {
     res.json({ message: status });
   }
   catch (error) {
-    res.status(404);
-    res.json({ message: error.message });
+    if(error instanceof HTTPError) {
+      res.status(error.status);
+      res.json({ message: error.message });
+      return;
+    }
+    else {
+      res.status(500);
+      res.json({ message: error.message });
+      return;
+    }
   }
 };
 
@@ -59,8 +92,16 @@ const completeTask = async (req, res) => {
     res.json(task);
   }
   catch (error) {
-    res.status(404);
-    res.json({ message: error.message });
+    if(error instanceof HTTPError) {
+      res.status(error.status);
+      res.json({ message: error.message });
+      return;
+    }
+    else {
+      res.status(500);
+      res.json({ message: error.message });
+      return;
+    }
   }
 };
 
@@ -73,8 +114,16 @@ const updateTask = async (req, res) => {
     res.json(updatedTask);
   }
   catch (error) {
-    res.status(404);
-    res.json({ message: error.message });
+    if(error instanceof HTTPError) {
+      res.status(error.status);
+      res.json({ message: error.message });
+      return;
+    }
+    else {
+      res.status(500);
+      res.json({ message: error.message });
+      return;
+    }
   }
 };
 
