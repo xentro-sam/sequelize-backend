@@ -14,15 +14,16 @@ const validateId = Joi.object({
 });
 
 const createTask = async (task) => {
+  if(Array.isArray(task)) {
+    throw new HTTPError('Input is not in JSON', 400);
+  }
   const id = uuidv4();
   const newTask = {
     ...task,
     id,
     isComplete: false
   }
-  if(await schema.validateAsync(newTask) instanceof Error) {
-    throw new HTTPError('Input is not in JSON', 400);
-  }
+  await schema.validateAsync(newTask)
   return await db.Task.create(newTask);
 };
 
@@ -70,7 +71,7 @@ const updateTask = async (id, data) => {
   if (!task.length) {
     throw new HTTPError(`Task with id ${id} was not found`, 404);
   }
-  task = {...task, ...data}
+  task = {...task[0], ...data}
   await schema.validateAsync(task);
   await db.Task.update(task, { where: { id } });
   task = await db.Task.findOne({ where: { id } });

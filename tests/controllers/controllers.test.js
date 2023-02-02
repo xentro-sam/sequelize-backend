@@ -72,7 +72,7 @@ describe('Task controllers', () => {
         });
     });
     describe('createTask', () => {
-        xit('should return 201', async () => {
+        it('should return 201', async () => {
             const spy = jest.spyOn(controllers, 'createTask');
             const req = {
                 body: {
@@ -87,7 +87,7 @@ describe('Task controllers', () => {
             expect(spy).toHaveBeenCalled();
             expect(res.status).toBeCalledWith(201);
         });
-        xit('should return 400', async () => {
+        it('should return 400', async () => {
             const spy = jest.spyOn(controllers, 'createTask');
             const req = {
                 body: ['Buy milk']
@@ -186,14 +186,14 @@ describe('Task controllers', () => {
         });
     })
     describe('updateTask', () => {
-        xit('should return 200', async() => {
+        it('should return 200', async() => {
             const spy = jest.spyOn(controllers, 'updateTask');
             const spyDb = jest.spyOn(db.Task, 'findAll');
             await spyDb.mockResolvedValue([
                 {
                     id: '29c6b13d-1409-4808-ba52-4692dca2ce61',
                     name: 'Task 1',
-                    isCompleted: false
+                    isComplete: false
                 }
             ]);
             const req = {
@@ -212,7 +212,7 @@ describe('Task controllers', () => {
             expect(spy).toHaveBeenCalled();
             expect(res.status).toBeCalledWith(200);
         });
-        xit('should return 404', async() => {
+        it('should return 404', async() => {
             const spy = jest.spyOn(controllers, 'updateTask');
             const spyDb = jest.spyOn(db.Task, 'findAll');
             await spyDb.mockResolvedValue([]);
