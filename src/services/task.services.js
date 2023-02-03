@@ -46,11 +46,10 @@ const getTask = async (id) => {
 
 const deleteTask = async (id) => {
   await validateId.validateAsync({ id });
-  const task = await db.Task.findAll({ where: { id } });
-  if (!task.length) {
+  const rows = await db.Task.destroy({ where: { id } });
+  if (!rows) {
     throw new HTTPError(`Task with id ${id} was not found`, 404);
   }
-  await db.Task.destroy({ where: { id: id } });
   return 'Task deleted successfully';
 };
 
