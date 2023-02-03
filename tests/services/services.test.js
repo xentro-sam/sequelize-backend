@@ -122,30 +122,74 @@ describe('Task services', () => {
         });
         it('should update task', async () => {
             const spy = jest.spyOn(services, 'updateTask');
+            const spyFindAll = jest.spyOn(db.Task, 'findAll');
             const spyDb = jest.spyOn(db.Task, 'update');
             const data = {
                 id: '29c6b13d-1409-4808-ba52-4692dca2ce61',
                 name: 'Task 1',
                 isComplete: false
             }
+            await spyFindAll.mockResolvedValue([data]);
             await spyDb.mockResolvedValue([1]);
-            await services.updateTask(data);
+            await services.updateTask(data.id, { name: data.name });
             expect(spy).toHaveBeenCalled();
             expect(spyDb).toHaveBeenCalled();
+            expect(spyFindAll).toHaveBeenCalled();
+            const mockResponse = await spy.mock.results[0].value;
+            expect(mockResponse).toMatchObject([data]);
+        });
+        it('should throw error', async () => {
+            const spy = jest.spyOn(services, 'updateTask');
+            const spyDb = jest.spyOn(db.Task, 'findAll');
+            const data = {
+                id: '29c6b13d-1409-4808-ba52-4692dca2ce61',
+                name: 'Task 1',
+                isComplete: false
+            }
+            await spyDb.mockResolvedValue([]);
+            try {
+                await services.updateTask(data.id, { name: data.name });
+                expect(spy).toHaveBeenCalled();
+                expect(spyDb).toHaveBeenCalled();
+                await spy.mock.results[0].value;
+            } catch (error) {
+                expect(error).toMatchObject({ message: 'Task with id 29c6b13d-1409-4808-ba52-4692dca2ce61 was not found', status: 404 });
+            }
+        });
+    });
+    describe('completeTask', () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+        it('should complete task', async () => {
+            const spy = jest.spyOn(services, 'completeTask');
+            const spyFindAll = jest.spyOn(db.Task, 'findAll');
+            const spyDb = jest.spyOn(db.Task, 'update');
+            const data = {
+                id: '29c6b13d-1409-4808-ba52-4692dca2ce61',
+                name: 'Task 1',
+                isComplete: false
+            }
+            await spyFindAll.mockResolvedValue([data]);
+            await spyDb.mockResolvedValue([1]);
+            await services.completeTask(data.id);
+            expect(spy).toHaveBeenCalled();
+            expect(spyDb).toHaveBeenCalled();
+            expect(spyFindAll).toHaveBeenCalled();
             const mockResponse = await spy.mock.results[0].value;
             expect(mockResponse).toMatchObject(data);
         });
         it('should throw error', async () => {
-            const spy = jest.spyOn(services, 'updateTask');
-            const spyDb = jest.spyOn(db.Task, 'update');
+            const spy = jest.spyOn(services, 'completeTask');
+            const spyDb = jest.spyOn(db.Task, 'findAll');
             const data = {
                 id: '29c6b13d-1409-4808-ba52-4692dca2ce61',
                 name: 'Task 1',
                 isComplete: false
             }
-            await spyDb.mockResolvedValue([0]);
+            await spyDb.mockResolvedValue([]);
             try {
-                await services.updateTask(data);
+                await services.completeTask(data.id);
                 expect(spy).toHaveBeenCalled();
                 expect(spyDb).toHaveBeenCalled();
                 await spy.mock.results[0].value;
