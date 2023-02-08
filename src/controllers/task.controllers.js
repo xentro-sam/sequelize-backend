@@ -23,8 +23,8 @@ const getTasks = async (req, res) => {
 
 const getTask = async (req, res) => {
   try {
-    const { id } = req.params;
-    const task = await taskService.getTask(id);
+    const { uuid } = req.params;
+    const task = await taskService.getTask(uuid);
     res.status(200);
     res.json(task);
   }
@@ -65,8 +65,8 @@ const createTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    const { id } = req.params;
-    let status = await taskService.deleteTask(id);
+    const { uuid } = req.params;
+    let status = await taskService.deleteTask(uuid);
     res.status(200);
     res.json({ message: status });
   }
@@ -86,8 +86,8 @@ const deleteTask = async (req, res) => {
 
 const completeTask = async (req, res) => {
   try {
-    const { id } = req.params;
-    const task = await taskService.completeTask(id);
+    const { uuid } = req.params;
+    const task = await taskService.completeTask(uuid);
     res.status(200);
     res.json(task);
   }
@@ -108,8 +108,8 @@ const completeTask = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const taskData = req.body;
-    const { id } = req.params;
-    const updatedTask = await taskService.updateTask(id, taskData);
+    const { uuid } = req.params;
+    const updatedTask = await taskService.updateTask(uuid, taskData);
     res.status(200);
     res.json(updatedTask);
   }

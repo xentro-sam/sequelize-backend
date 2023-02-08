@@ -8,7 +8,7 @@ TodoRoutes.route('/tasks')
   .get(Todo.getTasks)
   .post(Todo.createTask);
 
-TodoRoutes.route('/tasks/:id')
+TodoRoutes.route('/tasks/:uuid')
   .get(validateId, Todo.getTask)
   .patch(validateId, Todo.completeTask)
   .put(validateId, Todo.updateTask)

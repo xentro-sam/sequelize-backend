@@ -6,57 +6,57 @@ const createTask = async (task) => {
   if(Array.isArray(task)) {
     throw new HTTPError('Input is not in JSON', 400);
   }
-  const id = uuidv4();
+  const uuid = uuidv4();
   const newTask = {
     ...task,
-    id,
+    uuid,
     isComplete: false
   }
-  return await db.Task.create(newTask);
+  return await db.Tasks.create(newTask);
 };
 
 const getTasks = async () => {
-  const tasks = await db.Task.findAll();
+  const tasks = await db.Tasks.findAll();
   if (!tasks.length) {
     throw new HTTPError('No tasks found', 404);
   }
   return tasks;
 };
 
-const getTask = async (id) => {
-  const task = await db.Task.findAll({ where: { id } });
+const getTask = async (uuid) => {
+  const task = await db.Tasks.findAll({ where: { uuid } });
   if (!task.length) {
-    throw new HTTPError(`Task with id ${id} was not found`, 404);
+    throw new HTTPError(`Task with id ${uuid} was not found`, 404);
   }
   return task;
 };
 
-const deleteTask = async (id) => {
-  const rows = await db.Task.destroy({ where: { id } });
+const deleteTask = async (uuid) => {
+  const rows = await db.Tasks.destroy({ where: { uuid } });
   if (!rows) {
-    throw new HTTPError(`Task with id ${id} was not found`, 404);
+    throw new HTTPError(`Task with id ${uuid} was not found`, 404);
   }
   return 'Task deleted successfully';
 };
 
-const completeTask = async (id) => {
-  const task = await db.Task.findAll({ where: { id } });
+const completeTask = async (uuid) => {
+  const task = await db.Tasks.findAll({ where: { uuid } });
   if (!task.length) {
-    throw new HTTPError(`Task with id ${id} was not found`, 404);
+    throw new HTTPError(`Task with id ${uuid} was not found`, 404);
   }
-  await db.Task.update({ isComplete: true }, { where: { id } });
+  await db.Tasks.update({ isComplete: true }, { where: { uuid } });
   task[0].isComplete = true;
   return task[0];
 };
 
-const updateTask = async (id, data) => {
-  let task = await db.Task.findAll({ where: { id } });
+const updateTask = async (uuid, data) => {
+  let task = await db.Tasks.findAll({ where: { uuid } });
   if (!task.length) {
-    throw new HTTPError(`Task with id ${id} was not found`, 404);
+    throw new HTTPError(`Task with id ${uuid} was not found`, 404);
   }
   task = {...task[0], ...data}
-  await db.Task.update(task, { where: { id } });
-  task = await db.Task.findOne({ where: { id } });
+  await db.Tasks.update(task, { where: { uuid } });
+  task = await db.Tasks.findOne({ where: { uuid } });
   return task;
 };
 
