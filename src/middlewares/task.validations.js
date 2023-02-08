@@ -15,7 +15,11 @@ const validateId = (req, res, next) => {
 const isSignedIn = async (req, res, next) => {
     const token = req.headers.authorization;
     try {
-        const validate = await axios.post('http://localhost:4000/token/validate', { token });
+        await axios.get('http://localhost:4000/token/validate', { 
+            headers: {
+                authorization: token
+            }
+        });
     }
     catch (error) {
         res.status(401).json({ message: error.message });
